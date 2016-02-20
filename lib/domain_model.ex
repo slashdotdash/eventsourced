@@ -1,0 +1,2 @@
+defmodule DomainModel do
+end
