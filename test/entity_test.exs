@@ -2,10 +2,8 @@ defmodule EntityTest do
   use ExUnit.Case
   doctest DomainModel.Entity
 
-  alias DomainModel.Entity
-
   defmodule ExampleEntity do
-    use Entity, fields: [name: ""]
+    use DomainModel.Entity, fields: [name: ""]
 
     defmodule Events.NameAssigned do
       defstruct name: ""
