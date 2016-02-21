@@ -6,9 +6,18 @@ defmodule BankAccountTest do
 
   test "open account" do
     account = BankAccount.new
-    event = BankAccount.open_account(account, "ACC123", 100)
+      |> BankAccount.open_account("ACC123", 100)
 
-    assert event == %BankAccountOpened{id: account.id, account_number: "ACC123", initial_balance: 100}
-    assert BankAccount.apply(account, event) == %BankAccount{id: account.id, account_number: "ACC123", balance: 100}
+    assert account.events == [%BankAccountOpened{account_number: "ACC123", initial_balance: 100}]
+    assert account.state == %BankAccount.State{account_number: "ACC123", balance: 100}
+  end
+
+  test "reload from events" do
+    events = [%BankAccountOpened{account_number: "ACC123", initial_balance: 100}]
+    account = BankAccount.load("1234", events)
+
+    assert account.id == "1234"
+    assert account.state == %BankAccount.State{account_number: "ACC123", balance: 100}
+    assert length(account.events) == 1
   end
 end

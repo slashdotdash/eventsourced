@@ -1,20 +1,22 @@
-# DomainModel
+# Functional Domain Models with Event Sourcing in Elixir
 
-**TODO: Add description**
+Experiment to build functional, event-sourced domain models.
 
-## Installation
+- Aggregate methods accept the current state and a command, returning the new state (including any applied events).
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+### Creating a new aggregate and invoking command functions.
 
-  1. Add domain_model to your list of dependencies in `mix.exs`:
+```
+account = BankAccount.new
+  |> BankAccount.open_account("ACC123", 100)
+  |> BankAccount.deposit(50)
+  |> BankAccount.withdraw(75)
+```
 
-        def deps do
-          [{:domain_model, "~> 0.0.1"}]
-        end
+### Populating an aggregate from a given list of events.
 
-  2. Ensure domain_model is started before your application:
-
-        def application do
-          [applications: [:domain_model]]
-        end
-
+```
+account = BankAccount.load("1234", [
+  %BankAccountOpened{account_number: "ACC123", initial_balance: 100}
+])
+```
