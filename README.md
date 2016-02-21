@@ -100,11 +100,11 @@ defmodule BankAccount do
   end
 
   defp apply_event(%BankAccount{} = account, event, state) do
-    Map.merge(account, %{
+    %BankAccount{account | 
       events: [event | account.events],
       state: Map.merge(account.state, state),
       version: account.version + 1
-    })
+    }
   end
 end
 ```
