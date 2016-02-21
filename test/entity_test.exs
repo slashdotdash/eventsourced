@@ -16,7 +16,7 @@ defmodule EntityTest do
       |> apply(%Events.NameAssigned{name: name})
     end
 
-    defp apply(%ExampleEntity{} = entity, %Events.NameAssigned{} = name_assigned) do
+    def apply(%ExampleEntity{} = entity, %Events.NameAssigned{} = name_assigned) do
       apply_event(entity, name_assigned, fn state -> %{state | name: name_assigned.name} end)
     end
   end
@@ -30,6 +30,16 @@ defmodule EntityTest do
   test "applies event" do
     entity = ExampleEntity.new("id")
     |> ExampleEntity.assign_name("Ben")
+
+    assert entity.state == %ExampleEntity.State{name: "Ben"}
+    assert entity.version == 1
+    assert length(entity.events) == 1
+  end
+
+  test "load from events" do
+    entity = ExampleEntity.load("id", [
+      %ExampleEntity.Events.NameAssigned{name: "Ben"}
+    ])
 
     assert entity.state == %ExampleEntity.State{name: "Ben"}
     assert entity.version == 1
