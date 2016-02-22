@@ -59,8 +59,7 @@ defmodule BankAccount do
   end
 
   def load(id, events) do
-    account = %BankAccount{id: id, state: %BankAccount.State{}}    
-    Enum.reduce(events, account, &apply(&2, &1))
+    Enum.reduce(events, new(id), &apply(&2, &1))
   end
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do

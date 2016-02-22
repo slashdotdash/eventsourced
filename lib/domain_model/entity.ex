@@ -14,8 +14,7 @@ defmodule DomainModel.Entity do
       end
 
       def load(id, events) when is_list(events) do
-        entity = %__MODULE__{id: id, state: %__MODULE__.State{}}
-        Enum.reduce(events, entity, &__MODULE__.apply(&2, &1))
+        Enum.reduce(events, new(id), &__MODULE__.apply(&2, &1))
       end
 
       defp apply_event(%__MODULE__{} = entity, event, update_state_fn) do
