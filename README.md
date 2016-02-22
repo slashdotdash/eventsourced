@@ -8,7 +8,7 @@ Experiment to build functional, event-sourced domain models.
 ### Creating a new aggregate and invoking command functions
 
 ```elixir
-account = BankAccount.new
+account = BankAccount.new("1234")
   |> BankAccount.open_account("ACC123", 100)
   |> BankAccount.deposit(50)
   |> BankAccount.withdraw(75)
@@ -24,7 +24,9 @@ account = BankAccount.load("1234", [
 
 ### Event-sourced domain model
 
-For each event the model uses, a corresponding `apply/2` function must exist. It expects to receive the domain model (e.g. `%BankAccount{}`) and event (e.g. `BankAccount.Events.MoneyDeposited`).
+State may only be updated by applying an event. This is to allow internal state to be reconstituted by replaying a list of events. `Enum.reduce` the events against the empty state.
+
+For each event the model uses, a corresponding `apply/2` function must exist. It expects to receive the domain model (e.g. `%BankAccount{}`) and event (e.g. `BankAccount.Events.MoneyDeposited`). It delegates to the `apply_event/3` function to update the state, version and by prepending the new event to the list of applied events.
 
 ```elixir
 defmodule BankAccount do
@@ -81,28 +83,28 @@ defmodule BankAccount do
   end
 
   defp apply(%BankAccount{} = account, %BankAccountOpened{} = account_opened) do
-    apply_event(account, account_opened, %{
+    apply_event(account, account_opened, fn state -> %{state |
       account_number: account_opened.account_number,
       balance: account_opened.initial_balance
-    })
+    } end)
   end
 
   defp apply(%BankAccount{} = account, %MoneyDeposited{} = money_deposited) do
-    apply_event(account, money_deposited, %{
+    apply_event(account, money_deposited, fn state -> %{state |
       balance: money_deposited.balance
-    })
+    } end)
   end
 
   defp apply(%BankAccount{} = account, %MoneyWithdrawn{} = money_withdrawn) do
-    apply_event(account, money_withdrawn, %{
+    apply_event(account, money_withdrawn, fn state -> %{state |
       balance: money_withdrawn.balance
-    })
+    } end)
   end
 
-  defp apply_event(%BankAccount{} = account, event, state) do
-    %BankAccount{account | 
+  defp apply_event(%BankAccount{} = account, event, update_state_fn) do
+    %BankAccount{account |
       events: [event | account.events],
-      state: Map.merge(account.state, state),
+      state: update_state_fn.(account.state),
       version: account.version + 1
     }
   end
