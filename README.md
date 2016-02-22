@@ -26,7 +26,7 @@ account = BankAccount.load("1234", [
 
 State may only be updated by applying an event. This is to allow internal state to be reconstituted by replaying a list of events. `Enum.reduce` the events against the empty state.
 
-For each event the model uses, a corresponding `apply/2` function must exist. It expects to receive the domain model (e.g. `%BankAccount{}`) and event (e.g. `BankAccount.Events.MoneyDeposited`). It delegates to the `apply_event/3` function to update the state, version and by prepending the new event to the list of applied events.
+For each event the model uses, a corresponding `apply/2` function must exist. It expects to receive the domain model (e.g. `%BankAccount{}`) and event (e.g. `%BankAccount.Events.MoneyDeposited{}`). It delegates to the `apply_event/3` function to update the state, version and by prepending the new event to the list of applied events.
 
 ```elixir
 defmodule BankAccount do
@@ -54,8 +54,8 @@ defmodule BankAccount do
 
   alias Events.{BankAccountOpened,MoneyDeposited,MoneyWithdrawn}
 
-  def new do
-    %BankAccount{id: UUID.uuid1(), state: %BankAccount.State{}}
+  def new(id) do
+    %BankAccount{id: id, state: %BankAccount.State{}}
   end
 
   def load(id, events) do
