@@ -3,7 +3,7 @@
 Build functional, event-sourced domain models.
 
 - Aggregate methods accept the current state and a command, returning the new state (including any applied events).
-- Aggregate state is rebuilt from events by applying `reduce` function.
+- Aggregate state is rebuilt from events by applying a `reduce` function to these events.
 
 ### Creating a new aggregate and invoking command functions
 
