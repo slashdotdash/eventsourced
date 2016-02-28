@@ -1,9 +1,9 @@
 defmodule EntityTest do
   use ExUnit.Case
-  doctest DomainModel.Entity
+  doctest EventSourced.Entity
 
   defmodule ExampleEntity do
-    use DomainModel.Entity, fields: [name: ""]
+    use EventSourced.Entity, fields: [name: ""]
 
     defmodule Events.NameAssigned do
       defstruct name: ""

@@ -1,5 +1,5 @@
 defmodule BankAccount do
-  use DomainModel.Entity, fields: [account_number: nil, balance: nil]
+  use EventSourced.Entity, fields: [account_number: nil, balance: nil]
 
   defmodule Events do
     defmodule BankAccountOpened do

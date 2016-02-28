@@ -10,7 +10,7 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :domain_model, key: :value
+#     config :eventsourced, key: :value
 #
 # And access this configuration in your application as:
 #

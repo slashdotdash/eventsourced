@@ -1,4 +1,4 @@
-defmodule DomainModel.Entity do
+defmodule EventSourced.Entity do
   defmacro __using__(fields: fields) do
     quote do
       import Kernel, except: [apply: 2]

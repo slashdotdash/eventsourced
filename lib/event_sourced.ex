@@ -1,0 +1,2 @@
+defmodule EventSourced do
+end

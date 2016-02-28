@@ -1,6 +1,5 @@
 defmodule BankAccountTest do
   use ExUnit.Case
-  doctest DomainModel
 
   alias BankAccount.Events.{BankAccountOpened,MoneyDeposited,MoneyWithdrawn}
 
