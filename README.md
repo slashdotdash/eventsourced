@@ -51,38 +51,40 @@ defmodule BankAccount do
   alias Events.{BankAccountOpened,MoneyDeposited,MoneyWithdrawn}
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
-    account 
+    account
     |> apply(%BankAccountOpened { account_number: account_number, initial_balance: initial_balance })
   end
 
   def deposit(%BankAccount{} = account, amount) do
     balance = account.state.balance + amount
 
-    account 
+    account
     |> apply(%MoneyDeposited{ amount: amount, balance: balance })
   end
 
   def withdraw(%BankAccount{} = account, amount) do
     balance = account.state.balance - amount
 
-    account 
+    account
     |> apply(%MoneyWithdrawn{ amount: amount, balance: balance })
   end
 
-  defp apply(%BankAccount{} = account, %BankAccountOpened{} = account_opened) do
+  # event handling callbacks that mutate state
+
+  def apply(%BankAccount{} = account, %BankAccountOpened{} = account_opened) do
     apply_event(account, account_opened, fn state -> %{state |
       account_number: account_opened.account_number,
       balance: account_opened.initial_balance
     } end)
   end
 
-  defp apply(%BankAccount{} = account, %MoneyDeposited{} = money_deposited) do
+  def apply(%BankAccount{} = account, %MoneyDeposited{} = money_deposited) do
     apply_event(account, money_deposited, fn state -> %{state |
       balance: money_deposited.balance
     } end)
   end
 
-  defp apply(%BankAccount{} = account, %MoneyWithdrawn{} = money_withdrawn) do
+  def apply(%BankAccount{} = account, %MoneyWithdrawn{} = money_withdrawn) do
     apply_event(account, money_withdrawn, fn state -> %{state |
       balance: money_withdrawn.balance
     } end)
@@ -127,21 +129,21 @@ defmodule BankAccount do
   end
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
-    account 
+    account
     |> apply(%BankAccountOpened { account_number: account_number, initial_balance: initial_balance })
   end
 
   def deposit(%BankAccount{} = account, amount) do
     balance = account.state.balance + amount
 
-    account 
+    account
     |> apply(%MoneyDeposited{ amount: amount, balance: balance })
   end
 
   def withdraw(%BankAccount{} = account, amount) do
     balance = account.state.balance - amount
 
-    account 
+    account
     |> apply(%MoneyWithdrawn{ amount: amount, balance: balance })
   end
 
