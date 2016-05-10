@@ -25,6 +25,9 @@ defmodule AggregateRootTest do
     aggregate = ExampleAggregateRoot.new("uuid")
 
     assert aggregate.state == %ExampleAggregateRoot.State{name: ""}
+    assert aggregate.uuid == "uuid"
+    assert aggregate.version == 0
+    assert length(aggregate.pending_events) == 0
   end
 
   test "applies event" do
@@ -33,6 +36,7 @@ defmodule AggregateRootTest do
       |> ExampleAggregateRoot.assign_name("Ben")
 
     assert aggregate.state == %ExampleAggregateRoot.State{name: "Ben"}
+    assert aggregate.uuid == "uuid"
     assert aggregate.version == 1
     assert length(aggregate.pending_events) == 1
   end
@@ -41,7 +45,8 @@ defmodule AggregateRootTest do
     aggregate = ExampleAggregateRoot.load("uuid", [ %ExampleAggregateRoot.Events.NameAssigned{name: "Ben"} ])
 
     assert aggregate.state == %ExampleAggregateRoot.State{name: "Ben"}
+    assert aggregate.uuid == "uuid"
     assert aggregate.version == 1
-    assert length(aggregate.pending_events) == 0
+    assert length(aggregate.pending_events) == 0  # pending events should be empty after replaying events
   end
 end
