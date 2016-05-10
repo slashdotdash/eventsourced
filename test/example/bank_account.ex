@@ -1,5 +1,5 @@
 defmodule BankAccount do
-  use EventSourced.Entity, fields: [account_number: nil, balance: nil]
+  use EventSourced.AggregateRoot, fields: [account_number: nil, balance: nil]
 
   defmodule Events do
     defmodule BankAccountOpened do
@@ -19,39 +19,39 @@ defmodule BankAccount do
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
     account
-    |> apply(%BankAccountOpened{account_number: account_number, initial_balance: initial_balance})
+    |> update(%BankAccountOpened{account_number: account_number, initial_balance: initial_balance})
   end
 
   def deposit(%BankAccount{} = account, amount) do
     balance = account.state.balance + amount
 
     account
-    |> apply(%MoneyDeposited{ amount: amount, balance: balance })
+    |> update(%MoneyDeposited{amount: amount, balance: balance})
   end
 
   def withdraw(%BankAccount{} = account, amount) do
     balance = account.state.balance - amount
 
     account
-    |> apply(%MoneyWithdrawn{ amount: amount, balance: balance })
+    |> update(%MoneyWithdrawn{amount: amount, balance: balance})
   end
 
-  def apply(%BankAccount{} = account, %BankAccountOpened{} = account_opened) do
-    apply_event(account, account_opened, fn state -> %{state |
+  def apply(%BankAccount.State{} = state, %BankAccountOpened{} = account_opened) do
+    %BankAccount.State{state|
       account_number: account_opened.account_number,
       balance: account_opened.initial_balance
-    } end)
+    }
   end
 
-  def apply(%BankAccount{} = account, %MoneyDeposited{} = money_deposited) do
-    apply_event(account, money_deposited, fn state -> %{state |
+  def apply(%BankAccount.State{} = state, %MoneyDeposited{} = money_deposited) do
+    %BankAccount.State{state |
       balance: money_deposited.balance
-    } end)
+    }
   end
 
-  def apply(%BankAccount{} = account, %MoneyWithdrawn{} = money_withdrawn) do
-    apply_event(account, money_withdrawn, fn state -> %{state |
+  def apply(%BankAccount.State{} = state, %MoneyWithdrawn{} = money_withdrawn) do
+    %BankAccount.State{state |
       balance: money_withdrawn.balance
-    } end)
+    }
   end
 end
