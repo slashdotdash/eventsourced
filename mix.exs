@@ -20,6 +20,7 @@ defmodule EventSourced.Mixfile do
 
   defp deps do
     [
+      {:ex_doc, "~> 0.13.2", only: :dev},
       {:mix_test_watch, "~> 0.2", only: :dev}
     ]
   end
