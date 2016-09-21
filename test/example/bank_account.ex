@@ -36,6 +36,8 @@ defmodule BankAccount do
     |> update(%MoneyWithdrawn{amount: amount, balance: balance})
   end
 
+  # state mutators
+
   def apply(%BankAccount.State{} = state, %BankAccountOpened{} = account_opened) do
     %BankAccount.State{state|
       account_number: account_opened.account_number,

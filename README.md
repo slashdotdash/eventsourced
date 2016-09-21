@@ -5,6 +5,10 @@ Build functional, event-sourced domain models.
 - Aggregate root public methods accept the current state and a command, returning the new state (including any applied events).
 - Aggregate root state is rebuilt from events by applying a `reduce` function, starting from an empty state.
 
+MIT License
+
+[![Build Status](https://travis-ci.org/slashdotdash/eventsourced.svg?branch=master)](https://travis-ci.org/slashdotdash/eventsourced)
+
 ### Creating a new aggregate root and invoking command functions
 
 ```elixir
