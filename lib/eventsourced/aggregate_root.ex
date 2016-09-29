@@ -29,7 +29,7 @@ defmodule EventSourced.AggregateRoot do
       defp update(%__MODULE__{uuid: uuid, version: version, pending_events: pending_events, state: state} = aggregate, event) do
         version = version + 1
         state = __MODULE__.apply(state, event)
-        pending_events = [event | pending_events] |> Enum.reverse
+        pending_events = pending_events ++ [event]
 
         %__MODULE__{aggregate |
           pending_events: pending_events,

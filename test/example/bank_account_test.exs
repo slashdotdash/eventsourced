@@ -36,15 +36,17 @@ defmodule BankAccountTest do
     account =
       with account <- BankAccount.new("123"),
         {:ok, account} <- BankAccount.open_account(account, "ACC123", 100),
-        {:ok, account} <- BankAccount.withdraw(account, 50),
+        {:ok, account} <- BankAccount.deposit(account, 50),
+        {:ok, account} <- BankAccount.withdraw(account, 25),
       do: account
 
     assert account.pending_events == [
       %BankAccountOpened{account_number: "ACC123", initial_balance: 100},
-      %MoneyWithdrawn{amount: 50, balance: 50}
+      %MoneyDeposited{amount: 50, balance: 150},
+      %MoneyWithdrawn{amount: 25, balance: 125}
     ]
-    assert account.state == %BankAccount.State{account_number: "ACC123", balance: 50}
-    assert account.version == 2
+    assert account.state == %BankAccount.State{account_number: "ACC123", balance: 125}
+    assert account.version == 3
   end
 
   test "load from events" do
