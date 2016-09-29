@@ -36,8 +36,8 @@ defmodule BankAccount do
 
   alias Events.{BankAccountOpened,MoneyDeposited,MoneyWithdrawn}
 
-  def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance <= 0 do
-    {:erorr, :initial_balance_must_be_above_zero}
+  def open_account(%BankAccount{} = _account, _account_number, initial_balance) when initial_balance <= 0 do
+    {:error, :initial_balance_must_be_above_zero}
   end
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do

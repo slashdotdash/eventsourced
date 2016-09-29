@@ -49,6 +49,13 @@ defmodule BankAccountTest do
     assert account.version == 3
   end
 
+  test "business rule violation" do
+    {:error, :initial_balance_must_be_above_zero} =
+      with account <- BankAccount.new("123"),
+        {:ok, account} <- BankAccount.open_account(account, "ACC123", 0),
+      do: account
+  end
+
   test "load from events" do
     events = [
       %BankAccountOpened{account_number: "ACC123", initial_balance: 100},

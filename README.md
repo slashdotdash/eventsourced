@@ -138,7 +138,7 @@ defmodule BankAccount do
   # ... event and command definition as above
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance <= 0 do
-    {:erorr, :initial_balance_must_be_above_zero}
+    {:error, :initial_balance_must_be_above_zero}
   end
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
