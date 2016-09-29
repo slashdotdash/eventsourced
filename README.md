@@ -114,11 +114,82 @@ test "deposit money" do
     |> BankAccount.open_account("ACC123", 100)
     |> BankAccount.deposit(50)
 
-  assert Enum.reverse(account.pending_events) == [
+  assert account.pending_events == [
     %BankAccountOpened{account_number: "ACC123", initial_balance: 100},
     %MoneyDeposited{amount: 50, balance: 150}
   ]
   assert account.state == %BankAccount.State{account_number: "ACC123", balance: 150}
   assert account.version == 2
 end
+```
+
+## Handling business rule violations
+
+### Return `:ok` or `:error` tuples
+
+This is the most common and idiomatic Elixir approach to writing functions that may error.
+
+The aggregate root must return either an `{:ok, aggregate}` or `{:error, reason}` tuple from each public API function on success or failure.
+
+```elixir
+defmodule BankAccount do
+  use EventSourced.AggregateRoot, fields: [account_number: nil, balance: nil]
+
+  # ... event and command definition as above
+
+  def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance <= 0 do
+    {:erorr, :initial_balance_must_be_above_zero}
+  end
+
+  def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
+    {:ok, update(account, %BankAccountOpened{account_number: account_number, initial_balance: initial_balance})}
+  end
+end
+```
+
+Following this approach allows strict pattern matching on success and failures. An error indicates a domain business rule violation, such as attempting to open an account with a negative initial balance.
+
+You cannot use the pipeline operator (`|>`) to chain the functions. Use the `with` special form instead. This is demonstrated in the example below.
+
+```elixir
+with account <- BankAccount.new("123"),
+  {:ok, account} <- BankAccount.open_account(account, "ACC123", 100),
+  {:ok, account} <- BankAccount.deposit(account, 50),
+do: account
+```
+
+### Raise an exception
+
+Prevent the aggregate root function from successfully executing by using one of the following tactics.
+
+- Use guard clauses and pattern matching on functions to prevent invalid invocation.
+- Raise an exception when a business rule violation is encountered.
+
+```elixir
+defmodule BankAccount do
+  use EventSourced.AggregateRoot, fields: [account_number: nil, balance: nil]
+
+  # ... event and command definition as above
+
+  defmodule InvalidOpeningBalanceError do
+    defexception message: "initial balance must be above zero"
+  end
+
+  def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance <= 0 do
+    raise InvalidOpeningBalanceError
+  end
+
+  def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
+    {:ok, update(account, %BankAccountOpened{account_number: account_number, initial_balance: initial_balance})}
+  end
+end
+```
+
+This allows you to use the pipeline operator (`|>`) to chain functions.
+
+```elixir
+account =
+  BankAccount.new("123")
+  |> BankAccount.open_account("ACC123", 100)
+  |> BankAccount.deposit(50)
 ```
