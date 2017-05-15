@@ -180,7 +180,7 @@ defmodule BankAccount do
   end
 
   def open_account(%BankAccount{} = account, account_number, initial_balance) when initial_balance > 0 do
-    {:ok, update(account, %BankAccountOpened{account_number: account_number, initial_balance: initial_balance})}
+    update(account, %BankAccountOpened{account_number: account_number, initial_balance: initial_balance})
   end
 end
 ```
